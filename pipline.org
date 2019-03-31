@@ -2,12 +2,15 @@
 ** DONE 读入物种的注释文件
 1. 是否为转录本
 2. 保存所有转录本的genetype
-** 读入assembly的注释文件
+** DONE 读入assembly的注释文件
 1. 要求该文件为gffcompare比较过的
 2. 筛选所有的非蛋白质编码RNA
 3. 构建字典，保存所有noncodingRNA的位置
-** 提取序列
+** DONE 对assembly的gtf文件进行分类注释
+** DONE 提取序列
 1. 使用gffread从基因组中提取非编码RNA的序列
 2. 调用CNCI进行预测
 3. 设定CNCI的参数
 4. 输出结果
+1. 提取所有不是protein-coding的蛋白
+2. 调用gffread将序列提取出来
