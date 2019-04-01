@@ -103,7 +103,7 @@ def non_protein_coding(merge_unannotated, length_threshold, work_dir):
     #print(os.path.join(work_dir, "uncoding.bed.file"))
     bed_file = open(os.path.join(work_dir, "uncoding.bed.file"), "a")
     for seq in range(0, len(uncoding), 4):
-        bed_file.write('\t'.join([uncoding[seq], str(int(uncoding[seq+2])-1), uncoding[seq+3]]))
+        bed_file.write('\t'.join([uncoding[seq], str(int(uncoding[seq+2])-1), uncoding[seq+3], uncoding[seq+1]]))
         bed_file.write("\n")
     bed_file.close()
 #        print('\t'.join([uncoding[seq], uncoding[seq+1], uncoding[seq+2]]))
@@ -111,10 +111,45 @@ def non_protein_coding(merge_unannotated, length_threshold, work_dir):
 
 def get_non_protein_coding_seq(work_dir, fasta):
     bed_file_path = os.path.join(work_dir, "uncoding.bed.file")
+    bed_out = os.path.join(work_dir, "uncoding.fasta")
     bed_tool_command = ''.join(["bedtools getfasta", " -fi ", fasta, " -bed ", bed_file_path,
                                 " -fo ", os.path.join(work_dir, "uncoding.fasta")])
+
+    print("BEGIN geting sequence...")
     result = subprocess.getoutput(bed_tool_command)
+    if "bedtools: not found" in result:
+        print("ERROR, can't find bedtools")
+        print("Please add the path of bedtools to envirment")
+    else:
+        print("FINISH")
+
+    return bed_out
+
+
+def CPC2_analysis(work_dir, bed_out):
+    cpc_input = os.path.join(work_dir, bed_out)
+    which_cpc = subprocess.getoutput("which CPC2.py")
+    cpc_output = os.path.join(work_dir, "cpc.out")
+    cpc_command = ' '.join(['python', which_cpc, '-i', cpc_input, '-o', cpc_output])
+#    print(cpc_command)
+    print("BEGIN CPC2 analysis")
+    result = subprocess.getoutput(cpc_command)
     print(result)
+    print("REMOVE coding sequence")
+    uncoding_list = []
+    with open(cpc_output, "r") as file:
+        for line in file:
+            if line.strip().split("\t")[-1] == "coding":
+                continue
+            else:
+                uncoding_list.append(line)
+    cpc_uncoding = os.path.join(work_dir, "cpc.uncoding")
+    file = open(cpc_uncoding, "a")
+    for i in uncoding_list:
+        file.write(i)
+    file.close()
+
+    print("FINISH CPC2 analysis")
 
 
 def get_args():
@@ -127,6 +162,8 @@ def get_args():
                         help="the length threshold of LncRNA, default = 200")
     parser.add_argument('--output', '-o', dest="work_dir", help="the directory of results and temfile")
     parser.add_argument('--fasta', '-f', dest="fasta", required=True, help="the path of fasta file")
+    parser.add_argument('--cpc2', dest="cpc", default=True,
+                        help="Boolen value, if False, the programe will not perform CPC2 analysi")
     args = parser.parse_args()
     return args
 
@@ -148,7 +185,9 @@ def main():
 #    print(merge_unannotated)
     biotype_distribution(biotypes, annotation, merge_annotated, merge_unannotated)
     non_protein_coding(merge_unannotated, length_threshold, work_dir)
-    get_non_protein_coding_seq(work_dir, fasta)
+    bed_out = get_non_protein_coding_seq(work_dir, fasta)
+    if args.cpc:
+        CPC2_analysis(work_dir, bed_out)
 
 
 if __name__ == "__main__":
