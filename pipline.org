@@ -1,4 +1,4 @@
-* LNC_PIPELINE
+* AnnL_PIPELINE
 ** DONE 读入物种的注释文件
 1. 是否为转录本
 2. 保存所有转录本的genetype
@@ -14,3 +14,15 @@
 4. 输出结果
 1. 提取所有不是protein-coding的蛋白
 2. 调用gffread将序列提取出来
+** 分析
+*** DONE CPC分析
+*** DONE CNCI分析
+*** TODO LGC分析
+*** TODO CPAT分析
+*** TODO phyloCSF
+
+** DONE 寻找交集
+*** DONE 提取交集序列
+*** DONE 将交集的基因组序列转化为蛋白质序列
+*** DONE 交集序列进行PfamScan在验证
+
