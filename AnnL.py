@@ -116,7 +116,7 @@ def calculate_exon_num(assembly_gtf_file):
 
 
 def biotype_distribution(biotypes, annotation, merge_annotated, merge_unannotated):
-    print("%s\t%s\t%s" % ("biotype", "annotated", "unannotated"))
+    print("%s\t%s\n" % ("biotype", "annotated"))
 #    print(annotation)
     biotype_distribution = {}
     for biotype in set(biotypes):
